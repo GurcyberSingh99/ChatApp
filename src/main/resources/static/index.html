@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusChat - Real-Time Premium Messaging</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Ambient Glowing Background Spheres -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <!-- AUTHENTICATION CONTAINER -->
+    <div id="auth-container" class="glass-panel active">
+        <div class="auth-header">
+            <div class="logo">
+                <i class="fa-solid fa-layer-group logo-icon"></i>
+                <span>Nexus<strong>Chat</strong></span>
+            </div>
+            <p class="auth-subtitle">Real-time dynamic workspaces</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
+            <button class="auth-tab" onclick="switchAuthTab('signup')">Create Account</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)">
+            <div class="input-group">
+                <label for="login-username"><i class="fa-solid fa-user"></i> Username</label>
+                <input type="text" id="login-username" placeholder="Enter username" required autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+                <input type="password" id="login-password" placeholder="Enter password" required autocomplete="current-password">
+            </div>
+            <div id="login-error" class="error-msg"></div>
+            <button type="submit" class="btn-primary">
+                <span>Access Dashboard</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="signup-form" class="auth-form" onsubmit="handleSignup(event)">
+            <div class="input-group">
+                <label for="signup-username"><i class="fa-solid fa-user"></i> Choose Username</label>
+                <input type="text" id="signup-username" placeholder="Unique username" required autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label for="signup-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                <input type="email" id="signup-email" placeholder="name@example.com" required autocomplete="email">
+            </div>
+            <div class="input-group">
+                <label for="signup-password"><i class="fa-solid fa-lock"></i> Create Password</label>
+                <input type="password" id="signup-password" placeholder="Strong password" required autocomplete="new-password">
+            </div>
+            <div class="avatar-selection">
+                <label><i class="fa-solid fa-wand-magic-sparkles"></i> Select Avatar Style</label>
+                <div class="avatar-options">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Alpha" class="avatar-option selected" onclick="selectAvatar(this, 'Alpha')" alt="Avatar Alpha">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Bravo" class="avatar-option" onclick="selectAvatar(this, 'Bravo')" alt="Avatar Bravo">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Delta" class="avatar-option" onclick="selectAvatar(this, 'Delta')" alt="Avatar Delta">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Echo" class="avatar-option" onclick="selectAvatar(this, 'Echo')" alt="Avatar Echo">
+                </div>
+                <input type="hidden" id="signup-avatar" value="https://api.dicebear.com/7.x/bottts/svg?seed=Alpha">
+            </div>
+            <div id="signup-error" class="error-msg"></div>
+            <button type="submit" class="btn-primary">
+                <span>Join Nexus</span>
+                <i class="fa-solid fa-user-plus"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- MAIN CHAT APPLICATION INTERFACE -->
+    <div id="app-container" class="app-layout hidden">
+        
+        <!-- SIDEBAR PANEL -->
+        <aside class="sidebar">
+            <!-- Current User Profile Header -->
+            <div class="user-profile-header">
+                <div class="profile-info">
+                    <div class="avatar-wrapper">
+                        <img id="current-user-avatar" src="" alt="Avatar">
+                        <div class="status-indicator online"></div>
+                    </div>
+                    <div class="user-details">
+                        <h4 id="current-user-name">Username</h4>
+                        <span class="badge">Online</span>
+                    </div>
+                </div>
+                <button class="btn-icon logout-btn" onclick="logout()" title="Secure Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+
+            <!-- Sidebar Navigation Content -->
+            <div class="sidebar-scrollable">
+                
+                <!-- Channels / Rooms Section -->
+                <div class="section-container">
+                    <div class="section-header">
+                        <span><i class="fa-solid fa-hashtag"></i> CHANNELS</span>
+                        <button class="btn-xs-icon" onclick="openCreateRoomModal()" title="Create Channel">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="channels-list" class="nav-list">
+                        <!-- Loaded dynamically -->
+                    </ul>
+                </div>
+
+                <!-- Direct Messages Section -->
+                <div class="section-container">
+                    <div class="section-header">
+                        <span><i class="fa-solid fa-comments"></i> DIRECT MESSAGES</span>
+                        <span id="users-count" class="count-badge">0</span>
+                    </div>
+                    <ul id="users-list" class="nav-list">
+                        <!-- Loaded dynamically -->
+                    </ul>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CHAT WORKSPACE AREA -->
+        <main class="chat-workspace">
+            
+            <!-- Chat Active Workspace Header -->
+            <header class="chat-header">
+                <div class="chat-target-info">
+                    <div id="chat-header-icon" class="target-icon">
+                        <i class="fa-solid fa-hashtag"></i>
+                    </div>
+                    <div class="target-titles">
+                        <h2 id="chat-target-name">Select a conversation</h2>
+                        <p id="chat-target-status">Connect with real-time members</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Chat Messages Scrollable Pane -->
+            <div id="messages-pane" class="messages-container">
+                <!-- Welcome splash screen -->
+                <div class="welcome-splash">
+                    <i class="fa-solid fa-messages splash-icon"></i>
+                    <h3>Welcome to NexusChat Workspace</h3>
+                    <p>Select a channel or direct chat from the sidebar to begin messaging instantly.</p>
+                </div>
+            </div>
+
+            <!-- Typing indicator output bar -->
+            <div id="typing-indicator" class="typing-bar">
+                <span>someone is typing...</span>
+            </div>
+
+            <!-- Staged File Preview Chip -->
+            <div id="file-preview-bar" class="file-preview-bar hidden">
+                <div class="file-chip">
+                    <i class="fa-solid fa-paperclip"></i>
+                    <span id="staged-file-name">filename.png</span>
+                    <button type="button" onclick="clearStagedFile()" class="btn-clear-file"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+
+            <!-- Bottom Interactive Input Area -->
+            <footer class="chat-footer">
+                <!-- Inline Emoji Quick Selector -->
+                <div class="quick-emojis">
+                    <span onclick="insertEmoji('👋')">👋</span>
+                    <span onclick="insertEmoji('🚀')">🚀</span>
+                    <span onclick="insertEmoji('🔥')">🔥</span>
+                    <span onclick="insertEmoji('❤️')">❤️</span>
+                    <span onclick="insertEmoji('😂')">😂</span>
+                    <span onclick="insertEmoji('✨')">✨</span>
+                    <span onclick="insertEmoji('👍')">👍</span>
+                    <span onclick="insertEmoji('💡')">💡</span>
+                </div>
+
+                <form id="message-form" class="message-input-form" onsubmit="sendChatMessage(event)">
+                    <input type="file" id="file-input" class="hidden" onchange="handleFileSelection(event)">
+                    <button type="button" class="btn-attach" onclick="triggerFileInput()" title="Attach File / Image">
+                        <i class="fa-solid fa-paperclip"></i>
+                    </button>
+                    
+                    <input type="text" id="message-input" class="message-input" placeholder="Type your message..." autocomplete="off" oninput="handleTypingEvent()">
+                    
+                    <button type="submit" class="btn-send" title="Send Message">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </footer>
+        </main>
+    </div>
+
+    <!-- MODAL: Create Channel -->
+    <div id="modal-backdrop" class="modal-backdrop hidden" onclick="closeCreateRoomModal()"></div>
+    <div id="create-room-modal" class="modal-box hidden">
+        <div class="modal-header">
+            <h3>Create New Channel</h3>
+            <button class="btn-xs-icon" onclick="closeCreateRoomModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form onsubmit="submitCreateRoom(event)">
+            <div class="input-group">
+                <label for="room-name">Channel Name</label>
+                <input type="text" id="room-name" placeholder="e.g. dev-updates" required autocomplete="off">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeCreateRoomModal()">Cancel</button>
+                <button type="submit" class="btn-primary">Create Channel</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- External WebSocket & STOMP scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <!-- Main Controller Logic -->
+    <script src="js/app.js"></script>
+</body>
+</html>
