@@ -6,7 +6,7 @@ spring:
     name: realtime-chat-app
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/chatapp}
+      uri: ${MONGODB_URI:mongodb+srv://singhgurcyber_db_user:Ef8RNaMi0sZbP5Uz@chatclustur.5b0wzoy.mongodb.net/chatapp?appName=ChatClustur}
       auto-index-creation: true
 
 app:
